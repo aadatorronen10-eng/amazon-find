@@ -1,0 +1,187 @@
+:root {
+    --primary-color: #232f3e;
+    --accent-color: #ff9900; /* Amazon Orange */
+    --bg-color: #f7f9fa;
+    --card-bg: #ffffff;
+}
+
+body {
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: var(--bg-color);
+    color: #333;
+}
+
+header {
+    background-color: var(--primary-color);
+    color: white;
+    text-align: center;
+    padding: 3rem 1rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+header h1 {
+    margin: 0 0 0.5rem 0;
+    font-size: 2.2rem;
+    font-weight: 700;
+}
+
+header p {
+    font-size: 1.1rem;
+    color: #f2f2f2;
+    margin: 0;
+}
+
+/* Dropdown Selector */
+.search-container {
+    margin-top: 1.8rem;
+}
+
+.search-container label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
+    color: #ddd;
+}
+
+.search-container select {
+    padding: 0.8rem 1.8rem;
+    font-size: 1rem;
+    border-radius: 25px;
+    border: 2px solid var(--accent-color);
+    background-color: white;
+    cursor: pointer;
+    font-weight: bold;
+    outline: none;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+
+/* Main Layout */
+main {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 1rem 6rem 1rem;
+}
+
+/* 📌 NEW: Elegant SEO Intro Box Style */
+.seo-intro {
+    background: var(--card-bg);
+    padding: 1.8rem;
+    border-radius: 12px;
+    margin-bottom: 2.5rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+    border-left: 5px solid var(--accent-color);
+}
+
+.seo-intro h2 {
+    margin-top: 0;
+    font-size: 1.4rem;
+    color: var(--primary-color);
+}
+
+.seo-intro p {
+    font-size: 1rem;
+    color: #555;
+    line-height: 1.6;
+    margin-bottom: 0;
+}
+
+/* Product Grid */
+.products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem;
+}
+
+/* Product Card */
+.product-card {
+    background: var(--card-bg);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    transition: transform 0.2s, box-shadow 0.2s;
+    display: flex;
+    flex-direction: column;
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+}
+
+.product-image {
+    width: 100%;
+    height: 220px;
+    background-color: #eaeded;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #7f8c8d;
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+.product-info {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+.product-tag {
+    background: #eef2f7;
+    color: #555;
+    font-size: 0.75rem;
+    padding: 0.25rem 0.7rem;
+    border-radius: 20px;
+    align-self: flex-start;
+    text-transform: uppercase;
+    font-weight: bold;
+    margin-bottom: 0.75rem;
+    letter-spacing: 0.5px;
+}
+
+.product-info h3 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.25rem;
+    color: #111;
+}
+
+.product-info p {
+    font-size: 0.95rem;
+    color: #555;
+    margin: 0 0 1.5rem 0;
+    flex-grow: 1;
+}
+
+/* Call to Action Button */
+.amazon-btn {
+    background-color: var(--accent-color);
+    color: #111;
+    text-align: center;
+    padding: 0.85rem;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: bold;
+    font-size: 0.95rem;
+    transition: background 0.2s;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.amazon-btn:hover {
+    background-color: #e68a00;
+}
+
+/* Fixed Footer */
+footer {
+    text-align: center;
+    padding: 1.2rem;
+    background-color: #131a22;
+    color: #ccc;
+    font-size: 0.85rem;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    box-sizing: border-box;
+}
