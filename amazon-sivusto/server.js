@@ -80,6 +80,10 @@ app.get('/api/ai-style-search', async (req, res) => {
     }
 });
 
-app.listen(PORT, () => {
-    console.log(`Groq-tekoälypalvelin käynnissä portissa http://localhost:${PORT}`);
-});
+//app.listen(PORT, () => {
+   // console.log(`Groq-tekoälypalvelin käynnissä portissa http://localhost:${PORT}`);
+
+
+
+module.exports = app;
+
