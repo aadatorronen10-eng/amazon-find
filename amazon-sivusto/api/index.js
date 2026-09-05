@@ -1,20 +1,17 @@
-require('dotenv').config();
 const express = require('express');
 const axios = require('axios');
 const cors = require('cors');
-const { Groq } = require('groq-sdk'); // Tuodaan Groq OpenAI:n tilalle
+const { Groq } = require('groq-sdk');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
 
-// Alustetaan Groq käyttäen .env-tiedoston avainta
+// Alustetaan Groq Vercelin ympäristömuuttujista
 const groq = new Groq({
     apiKey: process.env.GROQ_API_KEY
 });
 
 app.use(cors());
 app.use(express.json());
-app.use(express.static('.'));
 
 // FUNKTIO: Pyytää eBayan palvelimelta väliaikaisen OAuth-tokenin
 async function getEbayToken() {
@@ -35,13 +32,55 @@ async function getEbayToken() {
         throw error;
     }
 }
-// UUSI REITTI: Luo dynaamisen Amazon affiliate-hakulinkin Groq-tekoälyllä
+
+// REITTU 1: eBay-haku
+app.get('/api/ai-style-search', async (req, res) => {
+    try {
+        const styleCategory = req.query.style || 'classic style';
+        
+        const aiResponse = await groq.chat.completions.create({
+            model: "llama-3.3-70b-specdec",
+            messages: [
+                { 
+                    role: "system", 
+                    content: "Your task is to convert a clothing style category into 3-4 highly effective, specific keywords for searching unisex clothing items on eBay. Focus on iconic garments, textures, or key clothing pieces for that style. Respond ONLY with the space-separated English keywords. Do not include quotes, explanations, punctuation, or words like clothing or apparel." 
+                },
+                { 
+                    role: "user", 
+                    content: `Generate eBay search keywords for this style: "${styleCategory}". It must target unisex fashion items.` 
+                }
+            ],
+            max_tokens: 20
+        });
+
+        const aiKeywords = aiResponse.choices.message.content.trim();
+        console.log(`[Groq AI stailisti] Kategoria: "${styleCategory}" -> Hakusanat eBaylle: "${aiKeywords}"`);
+
+        const token = await getEbayToken();
+        const response = await axios.get(`https://ebay.com{encodeURIComponent(aiKeywords)}&limit=100`, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'X-EBAY-C-ENDUSERCTX': `affiliateCampaignId=${process.env.EBAY_CAMPAIGN_ID},affiliateReferenceId=tekoaly_tyylit`
+            }
+        });
+        
+        res.json({
+            usedKeywords: aiKeywords,
+            items: response.data.itemSummaries || []
+        });
+
+    } catch (error) {
+        console.error('Groq- tai eBay-haku epäonnistui:', error.message);
+        res.status(500).json({ error: 'Tuotteiden haku epäonnistui', details: error.message });
+    }
+});
+
+// REITTI 2: Amazon-affiliate-linkki
 app.get('/api/amazon-search-link', async (req, res) => {
     try {
         const theme = req.query.theme || 'vintage living room';
         const trackingId = process.env.AMAZON_TRACKING_ID || 'associates-tag-20';
 
-        // 1. Pyydetään Groqia keksimään parhaat hakusanat Amazon-hakuun teeman perusteesta
         const aiResponse = await groq.chat.completions.create({
             model: "llama-3.3-70b-specdec",
             messages: [
@@ -58,13 +97,9 @@ app.get('/api/amazon-search-link', async (req, res) => {
         });
 
         const aiKeywords = aiResponse.choices.message.content.trim();
-        
-        // 2. Rakennetaan virallinen Amazon affiliate-hakulinkki
         const amazonUrl = `https://amazon.com{encodeURIComponent(aiKeywords)}&tag=${trackingId}`;
 
-        console.log(`[Amazon AI] Teema: "${theme}" -> Hakusanat: "${aiKeywords}" -> Linkki luotu!`);
-
-        // Palautetaan valmis linkki selaimelle
+        console.log(`[Amazon AI] Teema: "${theme}" -> Hakusanat: "${aiKeywords}"`);
         res.json({ url: amazonUrl });
 
     } catch (error) {
@@ -73,54 +108,5 @@ app.get('/api/amazon-search-link', async (req, res) => {
     }
 });
 
-// API-REITTI: Groq-tekoälypohjainen tuotehaku kategorian mukaan
-app.get('/api/ai-style-search', async (req, res) => {
-    try {
-        const styleCategory = req.query.style || 'classic style';
-        
-        // 1. Pyydetään Groqia generoimaan parhaat hakusanat eBayta varten (Llama-3-mallilla)
-        const aiResponse = await groq.chat.completions.create({
-            model: "llama-3.3-70b-specdec", // Huippunopea ja älykäs avoimen lähdekoodin malli
-            messages: [
-                { 
-                    role: "system", 
-                    content: "Your task is to convert a clothing style category into 3-4 highly effective, specific keywords for searching unisex clothing items on eBay. Focus on iconic garments, textures, or key clothing pieces for that style. Respond ONLY with the space-separated English keywords. Do not include quotes, explanations, punctuation, or words like clothing or apparel." 
-                },
-                { 
-                    role: "user", 
-                    content: `Generate eBay search keywords for this style: "${styleCategory}". It must target unisex fashion items.` 
-                }
-            ],
-            max_tokens: 20
-        });
-
-        const aiKeywords = aiResponse.choices[0].message.content.trim();
-        console.log(`[Groq AI stailisti] Kategoria: "${styleCategory}" -> Hakusanat eBaylle: "${aiKeywords}"`);
-
-        // 2. Haetaan tuotteet eBaysta tekoälyn keksimillä hakusanoilla
-        const token = await getEbayToken();
-        const response = await axios.get(`https://ebay.com{encodeURIComponent(aiKeywords)}&limit=100`, {
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'X-EBAY-C-ENDUSERCTX': `affiliateCampaignId=${process.env.EBAY_CAMPAIGN_ID},affiliateReferenceId=tekoaly_tyylit`
-            }
-        });
-        
-        res.json({
-            usedKeywords: aiKeywords,
-            items: response.data.itemSummaries || []
-        });
-
-    } catch (error) {
-        console.error('Groq- tai eBay-haku epäonnistui:', error.message);
-        res.status(500).json({ error: 'Tuotteiden haku epäonnistui' });
-    }
-});
-
-//app.listen(PORT, () => {
-   // console.log(`Groq-tekoälypalvelin käynnissä portissa http://localhost:${PORT}`);
-
-
-
+// VERCEL REITTIVIENTI (TÄMÄ ON PAKOLLINEN)
 module.exports = app;
-
