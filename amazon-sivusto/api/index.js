@@ -1,8 +1,8 @@
-const express = require('express');
-const axios = require('axios');
-const cors = require('cors');
-const { Groq } = require('groq-sdk');
-const serverless = require('serverless-http'); // LISÄTTY TÄMÄ
+import express from 'express';
+import axios from 'axios';
+import cors from 'cors';
+import { Groq } from 'groq-sdk';
+import serverless from 'serverless-http';
 
 const app = express();
 
@@ -109,5 +109,6 @@ app.get('/api/amazon-search-link', async (req, res) => {
     }
 });
 
-// KÄÄRETÄÄN EXPRESS SERVERLESS-MUOTOON VERCELIÄ VARTEN:
-module.exports = serverless(app);
+// Vienti ES Module -muodossa
+const handler = serverless(app);
+export default handler;
