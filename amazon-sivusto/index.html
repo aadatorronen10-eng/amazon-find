@@ -413,7 +413,7 @@ function loadEbayProducts(styleName, element) {
     const container = document.getElementById('live-products-grid');
     container.innerHTML = '<div style="grid-column: 1/-1; text-align: center; font-size: 16px; color:#666;">Etsitään parhaita tyylituotteita tekoälyllä...</div>';
 
-    fetch(`/api/ai-style-search?style=${encodeURIComponent(styleName)}`)
+    fetch(`./api/ai-style-search?style=${encodeURIComponent(styleName)}`)
         .then(res => res.json())
         .then(data => {
             container.innerHTML = '';
@@ -456,7 +456,7 @@ function loadAmazonProducts(themeName, element) {
     document.getElementById('live-shop-title').innerText = themeName;
     document.getElementById('live-ai-status').innerText = "Groq AI valmistelee täydellistä Amazon-hakua...";
     
-    fetch(`/api/amazon-search-link?theme=${encodeURIComponent(themeName)}`)
+    fetch(`./api/amazon-search-link?theme=${encodeURIComponent(themeName)}`)
         .then(res => res.json())
         .then(data => {
             document.getElementById('live-ai-status').innerText = "Haku valmis! Avaataan Amazon uuteen välilehteen...";
