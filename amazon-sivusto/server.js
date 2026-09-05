@@ -35,6 +35,43 @@ async function getEbayToken() {
         throw error;
     }
 }
+// UUSI REITTI: Luo dynaamisen Amazon affiliate-hakulinkin Groq-tekoälyllä
+app.get('/api/amazon-search-link', async (req, res) => {
+    try {
+        const theme = req.query.theme || 'vintage living room';
+        const trackingId = process.env.AMAZON_TRACKING_ID || 'associates-tag-20';
+
+        // 1. Pyydetään Groqia keksimään parhaat hakusanat Amazon-hakuun teeman perusteesta
+        const aiResponse = await groq.chat.completions.create({
+            model: "llama-3.3-70b-specdec",
+            messages: [
+                { 
+                    role: "system", 
+                    content: "Your task is to convert a home decor or product theme into 3-4 highly effective, specific keywords for searching products on Amazon. Respond ONLY with the space-separated English keywords. Do not include quotes, explanations, punctuation, or generic filler words." 
+                },
+                { 
+                    role: "user", 
+                    content: `Generate Amazon search keywords for this theme: "${theme}".` 
+                }
+            ],
+            max_tokens: 15
+        });
+
+        const aiKeywords = aiResponse.choices.message.content.trim();
+        
+        // 2. Rakennetaan virallinen Amazon affiliate-hakulinkki
+        const amazonUrl = `https://amazon.com{encodeURIComponent(aiKeywords)}&tag=${trackingId}`;
+
+        console.log(`[Amazon AI] Teema: "${theme}" -> Hakusanat: "${aiKeywords}" -> Linkki luotu!`);
+
+        // Palautetaan valmis linkki selaimelle
+        res.json({ url: amazonUrl });
+
+    } catch (error) {
+        console.error('Amazon-hakulinkin luonti epäonnistui:', error.message);
+        res.status(500).json({ error: 'Linkin luonti epäonnistui' });
+    }
+});
 
 // API-REITTI: Groq-tekoälypohjainen tuotehaku kategorian mukaan
 app.get('/api/ai-style-search', async (req, res) => {

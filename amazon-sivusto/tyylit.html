@@ -3,7 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Style Shop</title>
+    <!-- SEO & Hakukoneoptimointi -->
+<title id="seo-title">Unisex Vaatetyylit & Muoti - AI Style Shop</title>
+<meta id="seo-description" name="description" content="Löydä upeimmat unisex vaatetyylit tekoälyn stailaamana. Selaa parhaita löytöjä suoraan netistä eri tyylikategorioissa.">
+<meta name="keywords" content="unisex vaatteet, vaatetyylit, muoti, gangsta style, mafia style, retro style, hiphop muoti, tekoäly stailisti">
+<meta name="robots" content="index, follow">
+
+<!-- Open Graph (Sosiaalisen median jaon optimointi, esim. Facebook, WhatsApp) -->
+<meta id="og-title" property="og:title" content="Unisex Vaatetyylit & Muoti - AI Style Shop">
+<meta id="og-description" property="og:description" content="Löydä upeimmat unisex vaatetyylit tekoälyn stailaamana.">
+<meta property="og:type" content="website">
+
     <style>
         body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; padding: 0; background: #f9f9f9; }
         /* Ylävalikko */
@@ -60,6 +70,23 @@
             document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
             if(element && !element.classList.contains('home-btn')) element.classList.add('active');
 
+            // DYNAMIC SEO UPDATE: Päivitetään sivun hakukonenäkyvyys valitun tyylin mukaan
+const formattedStyle = styleName.charAt(0).toUpperCase() + styleName.slice(1); // Muuttaa esim. "mafia style" -> "Mafia style"
+
+const newTitle = `${formattedStyle} | Unisex Vaatetyylit & Muoti - AI Shop`;
+const newDesc = `Tutki parhaita ${formattedStyle} unisex-vaatteita ja asusteita tekoälyn valitsemana. Katso päivän parhaat affiliate-löydöt livenä!`;
+
+// Päivitetään selaimen välilehden otsikko
+document.title = newTitle;
+
+// Päivitetään meta-kuvaukset hakukoneille
+document.getElementById('seo-title').innerText = newTitle;
+document.getElementById('seo-description').setAttribute('content', newDesc);
+
+// Päivitetään somen jaon tiedot (Open Graph)
+if(document.getElementById('og-title')) document.getElementById('og-title').setAttribute('content', newTitle);
+if(document.getElementById('og-description')) document.getElementById('og-description').setAttribute('content', newDesc);
+
             // Päivitetään otsikot lataustilaan
             document.getElementById('current-style-title').innerText = styleName;
             document.getElementById('ai-keywords').innerText = "Groq AI stailaa sivua ja hakee eBay-tuotteita...";
@@ -106,10 +133,28 @@
                 });
         }
 
-        // Ladataan oletustyyli heti kun sivu avataan ensimmäisen kerran
-        window.onload = function() {
-            loadStyle('gangsta style', document.querySelector('.nav-btn:not(.home-btn)'));
-        };
+        // Päivitetty window.onload lukemaan osoiterivin kategoria livenä etusivulta
+window.onload = function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const styleFromUrl = urlParams.get('style');
+    
+    if (styleFromUrl) {
+        // Jos käyttäjä tuli etusivun linkistä, ladataan suoraan se tyyli
+        // Etsitään valikosta vastaava painike ja laitetaan se aktiiviseksi
+        const buttons = document.querySelectorAll('.nav-btn');
+        let matchedButton = null;
+        buttons.forEach(btn => {
+            if (btn.innerText.toLowerCase() === styleFromUrl.toLowerCase()) {
+                matchedButton = btn;
+            }
+        });
+        loadStyle(styleFromUrl, matchedButton);
+    } else {
+        // Jos käyttäjä tuli suoraan sivulle ilman valintaa, ladataan oletus
+        loadStyle('gangsta style', document.querySelector('.nav-btn:not(.home-btn)'));
+    }
+};
+
     </script>
 </body>
 </html>
