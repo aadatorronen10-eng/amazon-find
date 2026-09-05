@@ -2,6 +2,7 @@ const express = require('express');
 const axios = require('axios');
 const cors = require('cors');
 const { Groq } = require('groq-sdk');
+const serverless = require('serverless-http'); // LISÄTTY TÄMÄ
 
 const app = express();
 
@@ -33,7 +34,7 @@ async function getEbayToken() {
     }
 }
 
-// REITTU 1: eBay-haku
+// REITTI 1: eBay-haku
 app.get('/api/ai-style-search', async (req, res) => {
     try {
         const styleCategory = req.query.style || 'classic style';
@@ -108,5 +109,5 @@ app.get('/api/amazon-search-link', async (req, res) => {
     }
 });
 
-// VERCEL REITTIVIENTI (TÄMÄ ON PAKOLLINEN)
-module.exports = app;
+// KÄÄRETÄÄN EXPRESS SERVERLESS-MUOTOON VERCELIÄ VARTEN:
+module.exports = serverless(app);
