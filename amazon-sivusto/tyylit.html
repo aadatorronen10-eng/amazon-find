@@ -95,7 +95,7 @@ if(document.getElementById('og-description')) document.getElementById('og-descri
             container.innerHTML = '<div class="loader">Etsitään parhaita tyylituotteita tekoälyllä...</div>';
 
             // Kutsutaan server.js:n tekoälyreittiä
-            fetch(`http://localhost:3000/api/ai-style-search?style=${encodeURIComponent(styleName)}`)
+            fetch(`/api/ai-style-search?style=${encodeURIComponent(styleName)}`)
                 .then(res => res.json())
                 .then(data => {
                     container.innerHTML = ''; // Tyhjennetään latausteksti
